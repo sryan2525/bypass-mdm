@@ -103,6 +103,20 @@ mkdir -p "/Volumes/Macintosh HD/Library/Managed Preferences"
 cp "$PROFILE_PATH" "/Volumes/Macintosh HD/Library/Managed Preferences/disable_erase.mobileconfig"
 echo -e "${GRN}Profile copied to system for installation at boot"
 
+# Find system UUID for Preboot path
+UUID=$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ { print $4 }')
+
+# Define the correct Preboot profile install path
+TARGET_DIR="/Volumes/Preboot/$UUID/System/Library/ConfigurationProfiles/Setup"
+
+# Create the path if needed
+mkdir -p "$TARGET_DIR"
+
+# Copy the profile into place
+cp "$PROFILE_PATH" "$TARGET_DIR/disable_erase.mobileconfig"
+
+echo -e "${GRN}Profile copied to Preboot Setup folder. Will be installed at first boot."
+
             # Remove configuration profiles
             touch /Volumes/Data/private/var/db/.AppleSetupDone
             rm -rf /Volumes/Macintosh\ HD/var/db/ConfigurationProfiles/Settings/.cloudConfigHasActivationRecord
