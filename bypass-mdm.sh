@@ -98,10 +98,10 @@ cat <<EOF > "$PROFILE_PATH"
 </plist>
 EOF
 
-# Install the profile
-profiles install -type configuration -path "$PROFILE_PATH"
-echo -e "${GRN}Profile installed to disable 'Erase All Content and Settings'"
-
+# Copy profile into managed preferences directory
+mkdir -p "/Volumes/Macintosh HD/Library/Managed Preferences"
+cp "$PROFILE_PATH" "/Volumes/Macintosh HD/Library/Managed Preferences/disable_erase.mobileconfig"
+echo -e "${GRN}Profile copied to system for installation at boot"
 
             # Remove configuration profiles
             touch /Volumes/Data/private/var/db/.AppleSetupDone
