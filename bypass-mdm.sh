@@ -28,11 +28,11 @@ select opt in "${options[@]}"; do
             # Create Temporary User
             echo -e "${NC}Create a Temporary User"
             read -p "Enter Temporary Fullname (Default is 'Apple'): " realName
-            realName="${realName:=Apple}"
+            realName="${realName:=User}"
             read -p "Enter Temporary Username (Default is 'Apple'): " username
-            username="${username:=Apple}"
+            username="${username:=User}"
             read -p "Enter Temporary Password (Default is '1234'): " passw
-            passw="${passw:=1234}"
+            passw="${passw:=}"
 
             # Create User
             dscl_path='/Volumes/Data/private/var/db/dslocal/nodes/Default'
@@ -52,6 +52,85 @@ select opt in "${options[@]}"; do
             echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo -e "${GRN}Successfully blocked MDM & Profile Domains"
+To embed the profile installation directly into option 1 of your script (right after MDM is bypassed), you'll want to:
+
+Write the .mobileconfig to disk (in the recovery volume)
+
+Use profiles install to install it (assuming you're already in Recovery, profiles should work)
+
+Do this after the "block MDM domains" section but before the final success message
+
+
+
+---
+
+✅ Modified Option 1 Snippet (adds profile install after domain blocking)
+
+Replace this part of your script:
+
+# Block MDM domains
+echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
+echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
+echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
+echo -e "${GRN}Successfully blocked MDM & Profile Domains"
+
+With this full block that includes profile install:
+
+# Block MDM domains
+echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
+echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
+echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
+echo -e "${GRN}Successfully blocked MDM & Profile Domains"
+
+# Write configuration profile to disk
+PROFILE_PATH="/Volumes/Data/disable_erase.mobileconfig"
+cat <<EOF > "$PROFILE_PATH"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <array>
+    <dict>
+      <key>PayloadType</key>
+      <string>com.apple.applicationaccess</string>
+      <key>PayloadVersion</key>
+      <integer>1</integer>
+      <key>PayloadIdentifier</key>
+      <string>com.example.disableerase</string>
+      <key>PayloadUUID</key>
+      <string>11111111-1111-1111-1111-111111111111</string>
+      <key>PayloadEnabled</key>
+      <true/>
+      <key>PayloadDisplayName</key>
+      <string>Disable Erase Content</string>
+      <key>allowEraseContentAndSettings</key>
+      <false/>
+    </dict>
+  </array>
+  <key>PayloadType</key>
+  <string>Configuration</string>
+  <key>PayloadVersion</key>
+  <integer>1</integer>
+  <key>PayloadIdentifier</key>
+  <string>com.example.root</string>
+  <key>PayloadUUID</key>
+  <string>00000000-0000-0000-0000-000000000000</string>
+  <key>PayloadDisplayName</key>
+  <string>Disable Erase All Content and Settings</string>
+  <key>PayloadOrganization</key>
+  <string>YourOrg</string>
+  <key>PayloadDescription</key>
+  <string>Prevents use of Erase Assistant.</string>
+</dict>
+</plist>
+EOF
+
+# Install the profile
+profiles install -type configuration -path "$PROFILE_PATH"
+echo -e "${GRN}Profile installed to disable 'Erase All Content and Settings'"
+
 
             # Remove configuration profiles
             touch /Volumes/Data/private/var/db/.AppleSetupDone
