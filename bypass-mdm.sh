@@ -118,11 +118,11 @@ cat <<EOF > "$PROFILE_PATH"
   <key>PayloadUUID</key>
   <string>00000000-0000-0000-0000-000000000000</string>
   <key>PayloadDisplayName</key>
-  <string>Disable Erase All Content and Settings</string>
+  <string>Default Administrator Policy</string>
   <key>PayloadOrganization</key>
   <string>YourOrg</string>
   <key>PayloadDescription</key>
-  <string>Prevents use of Erase Assistant.</string>
+  <string>Default Administrator policy. Removal can result in total data loss/possible device corruption</string>
 </dict>
 </plist>
 EOF
