@@ -52,35 +52,6 @@ select opt in "${options[@]}"; do
             echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo -e "${GRN}Successfully blocked MDM & Profile Domains"
-To embed the profile installation directly into option 1 of your script (right after MDM is bypassed), you'll want to:
-
-Write the .mobileconfig to disk (in the recovery volume)
-
-Use profiles install to install it (assuming you're already in Recovery, profiles should work)
-
-Do this after the "block MDM domains" section but before the final success message
-
-
-
----
-
-✅ Modified Option 1 Snippet (adds profile install after domain blocking)
-
-Replace this part of your script:
-
-# Block MDM domains
-echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
-echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
-echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
-echo -e "${GRN}Successfully blocked MDM & Profile Domains"
-
-With this full block that includes profile install:
-
-# Block MDM domains
-echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
-echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
-echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
-echo -e "${GRN}Successfully blocked MDM & Profile Domains"
 
 # Write configuration profile to disk
 PROFILE_PATH="/Volumes/Data/disable_erase.mobileconfig"
