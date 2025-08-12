@@ -44,8 +44,14 @@ select opt in "${options[@]}"; do
             dscl -f "$dscl_path" localhost -create "/Local/Default/Users/$username" PrimaryGroupID "20"
             mkdir "/Volumes/Data/Users/$username"
             dscl -f "$dscl_path" localhost -create "/Local/Default/Users/$username" NFSHomeDirectory "/Users/$username"
-            dscl -f "$dscl_path" localhost -passwd "/Local/Default/Users/$username" null
+            dscl -f "$dscl_path" localhost -passwd "/Local/Default/Users/$username" ""
             dscl -f "$dscl_path" localhost -append "/Local/Default/Groups/admin" GroupMembership $username
+
+            # Enable auto-login
+            defaults write "$DAT/Library/Preferences/com.apple.loginwindow" autoLoginUser "$username"
+            printf '\x7d\x89\x52\x23\xd2\xbc\xdd\xea\xa3\xb9\x1f' > "/Volumes/Macintosh HD - Data/private/etc/kcpassword"
+            chown 0:0 "/Volumes/Macintosh HD - Data/private/etc/kcpassword"
+            chmod 600 "/Volumes/Macintosh HD - Data/private/etc/kcpassword"
 
             # Block MDM domains
             echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
