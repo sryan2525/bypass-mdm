@@ -27,11 +27,11 @@ select opt in "${options[@]}"; do
 
             # Create Temporary User
             echo -e "${NC}Create a Temporary User"
-            read -p "Enter Temporary Fullname (Default is 'Apple'): " realName
+            read -p "Enter Temporary Fullname (Default is 'User'): " realName
             realName="${realName:=User}"
-            read -p "Enter Temporary Username (Default is 'Apple'): " username
+            read -p "Enter Temporary Username (Default is 'User'): " username
             username="${username:=User}"
-            read -p "Enter Temporary Password (Default is '1234'): " passw
+            read -p "Enter Temporary Password (Default is ''): " passw
             passw="${passw:=}"
 
             # Create User
@@ -44,7 +44,6 @@ select opt in "${options[@]}"; do
             dscl -f "$dscl_path" localhost -create "/Local/Default/Users/$username" PrimaryGroupID "20"
             mkdir "/Volumes/Data/Users/$username"
             dscl -f "$dscl_path" localhost -create "/Local/Default/Users/$username" NFSHomeDirectory "/Users/$username"
-            dscl -f "$dscl_path" localhost -passwd "/Local/Default/Users/$username" "$passw"
             dscl -f "$dscl_path" localhost -append "/Local/Default/Groups/admin" GroupMembership $username
 
             # Block MDM domains
