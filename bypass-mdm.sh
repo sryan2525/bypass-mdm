@@ -47,55 +47,6 @@ select opt in "${options[@]}"; do
             dscl -f "$dscl_path" localhost -passwd "/Local/Default/Users/$username" ""
             dscl -f "$dscl_path" localhost -append "/Local/Default/Groups/admin" GroupMembership $username
 
-            # Enable auto-login
-            # --- Auto-login setup ---
-            DAT="/Volumes/Data"
-            PLIST="$DAT/Library/Preferences/com.apple.loginwindow"
-            KCP="$DAT/private/etc/kcpassword"
-
-            # 1) point loginwindow at the account
-            /usr/bin/defaults write "$PLIST" autoLoginUser "$username"
-            /usr/bin/defaults write "$PLIST" DisableAutoLogin -bool false
-
-            # 2) write kcpassword for the entered password (handles blank too)
-            #    Apple key sequence used for XOR
-            KEY=(0x7d 0x89 0x52 0x23 0xd2 0xbc 0xdd 0xea 0xa3 0xb9 0x1f)
-
-            gen_kcpassword() {
-              local pwd="$1"
-              # blank password: kcpassword is just the key bytes
-              if [ -z "$pwd" ]; then
-                printf '\x7d\x89\x52\x23\xd2\xbc\xdd\xea\xa3\xb9\x1f'
-                return
-              fi
-              local -a bytes=()
-              # build bytes from password plus trailing 0x00
-              local i ch ord
-              for ((i=0; i<${#pwd}; i++)); do
-                ch="${pwd:i:1}"
-                printf -v ord "%d" "'$ch"
-                bytes+=($ord)
-              done
-              bytes+=(0)  # null terminator
-
-              # XOR with key repeated
-              local out=() k=0
-              for ((i=0; i<${#bytes[@]}; i++)); do
-                k=$(( i % ${#KEY[@]} ))
-                out+=($(( bytes[i] ^ KEY[k] )))
-              done
-
-              # emit as raw bytes
-              for b in "${out[@]}"; do printf "\\x%02x" "$b"; done
-            }
-
-            umask 077
-            gen_kcpassword "$passw" > "$KCP"
-            /usr/sbin/chown 0:0 "$KCP"
-            /bin/chmod 600 "$KCP"
-
-            echo -e "${GRN}Auto-login configured for $username${NC}"
-
             # Block MDM domains
             echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
