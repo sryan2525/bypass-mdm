@@ -49,9 +49,9 @@ select opt in "${options[@]}"; do
 
             # Enable auto-login
             defaults write "$DAT/Library/Preferences/com.apple.loginwindow" autoLoginUser "$username"
-            printf '\x7d\x89\x52\x23\xd2\xbc\xdd\xea\xa3\xb9\x1f' > "/Volumes/Macintosh HD - Data/private/etc/kcpassword"
-            chown 0:0 "/Volumes/Macintosh HD - Data/private/etc/kcpassword"
-            chmod 600 "/Volumes/Macintosh HD - Data/private/etc/kcpassword"
+            printf '\x7d\x89\x52\x23\xd2\xbc\xdd\xea\xa3\xb9\x1f' > "/Volumes/Data/private/etc/kcpassword"
+            chown 0:0 "/Volumes/Data/private/etc/kcpassword"
+            chmod 600 "/Volumes/Data/private/etc/kcpassword"
 
             # Block MDM domains
             echo "0.0.0.0 deviceenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
